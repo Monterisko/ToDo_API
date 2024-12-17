@@ -1,20 +1,21 @@
 ﻿using ToDo_API.Data;
+using ToDo_API.Interfaces;
 using ToDo_API.Models;
 
 namespace ToDo_API.Repository
 {
-    public class ToDoRepository
+    public class ToDoRepository : IToDoRepository
     {
-        private readonly DataContext context;
+        private readonly DataContext _context;
 
         public ToDoRepository(DataContext context) 
         {
-            this.context = context;
+            _context = context;
         }
 
-        public ICollection<ToDo> GetToDos()
+        public ICollection<ToDo> GetTodos()
         {
-            return context.ToDos.OrderBy(t => t.Id).ToList();
+            return _context.Todos.OrderBy(t => t.Id).ToList();
         }
     }
 }

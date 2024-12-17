@@ -3,10 +3,12 @@ using ToDo_API.Models;
 
 namespace ToDo_API.Data
 {
-    public class DataContext(DbContextOptions<DataContext> options) : DbContext(options)
+    public class DataContext : DbContext
     {
 
-        public DbSet<ToDo> ToDos { get; set; }
+        public DataContext(DbContextOptions<DataContext> options) : base(options) { }
+
+        public DbSet<ToDo> Todos { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
