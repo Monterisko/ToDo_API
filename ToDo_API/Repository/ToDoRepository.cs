@@ -19,11 +19,6 @@ namespace ToDo_API.Repository
             return _context.Todos.Where(t => t.Id == id).First();
         }
 
-        // Get from database ToDo with specific title
-        public ToDo GetTodo(string title)
-        {
-            return _context.Todos.Where(t => t.Title == title).First();
-        }
 
         // Get all ToDo from database
         public ICollection<ToDo> GetTodos()

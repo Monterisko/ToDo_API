@@ -22,6 +22,7 @@ namespace ToDo_API
             // Add services to the container.
             builder.Services.AddControllers();
             builder.Services.AddScoped<IToDoRepository, ToDoRepository>();
+            builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
