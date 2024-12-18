@@ -13,6 +13,18 @@ namespace ToDo_API.Interfaces
         // Check if ToDo exists
         bool TodoExists(int todoID);
 
+        ICollection<ToDo> GetTodayTodos();
+
+        ICollection<ToDo> GetTomorrowTodos();
+
+        ICollection<ToDo> GetWeeklyTodos();
+
+        public bool TodayTodoExists();
+
+        public bool TomorrowTodoExists();
+
+        public bool WeeklyTodoExists();
+
 
 
     }
