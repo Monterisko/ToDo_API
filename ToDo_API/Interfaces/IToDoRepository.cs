@@ -19,13 +19,14 @@ namespace ToDo_API.Interfaces
 
         ICollection<ToDo> GetWeeklyTodos();
 
-        public bool TodayTodoExists();
+        bool TodayTodoExists();
 
-        public bool TomorrowTodoExists();
+        bool TomorrowTodoExists();
 
-        public bool WeeklyTodoExists();
+        bool WeeklyTodoExists();
 
+        bool CreateToDo(ToDo toDo);
 
-
+        bool Save();
     }
 }

@@ -92,5 +92,33 @@ namespace ToDo_API.Conttrollers
 
             return Ok(todo);
         }
+
+        [HttpPost]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        public IActionResult CreateTodo([FromBody]TodoDTO todoCreate)
+        {
+            if (todoCreate == null)
+                return BadRequest(ModelState);
+            var todo = todoRepository.GetTodos()
+                .Where(t => t.Title.Trim().ToUpper() == todoCreate.Title.Trim().ToUpper()).FirstOrDefault();
+
+            if (todo != null)
+            {
+                ModelState.AddModelError("", "ToDo already exists");
+                return StatusCode(422, ModelState);
+            }
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var todoMap = mapper.Map<ToDo>(todoCreate);
+            if(!todoRepository.CreateToDo(todoMap))
+            {
+                ModelState.AddModelError("", "Something went wrong while saving");
+                return StatusCode(500, ModelState);
+            }
+            return Ok("Successfully created");
+        }
+
     }
 }

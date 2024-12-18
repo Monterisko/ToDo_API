@@ -73,5 +73,17 @@ namespace ToDo_API.Repository
             var today = DateTime.Today;
             return _context.Todos.Any(t => ((t.DateOfExpiry.Day <= week.Day && t.DateOfExpiry.Day >= today.Day) && (t.DateOfExpiry.Month == week.Month && t.DateOfExpiry.Month >= today.Month) && (t.DateOfExpiry.Year <= week.Year && t.DateOfExpiry.Year >= today.Year)));
         }
+
+        public bool CreateToDo(ToDo toDo)
+        {
+            _context.Add(toDo);
+            return Save();
+        }
+
+        public bool Save()
+        {
+            var saved = _context.SaveChanges();
+            return saved > 0 ? true : false;
+        }
     }
 }

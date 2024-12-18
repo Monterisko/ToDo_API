@@ -9,6 +9,7 @@ namespace ToDo_API.Helper
         public MappingProfiles() 
         {
             CreateMap<ToDo, TodoDTO>();
+            CreateMap<TodoDTO, ToDo>();
         }
     }
 }
