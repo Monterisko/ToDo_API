@@ -31,5 +31,8 @@ namespace ToDo_API.Interfaces
 
         bool UpdateToDo(ToDo todo);
 
+        bool DeleteToDo(ToDo todo);
+
+
     }
 }

@@ -150,7 +150,24 @@ namespace ToDo_API.Conttrollers
             return NoContent();
         }
 
-
-    
+        [HttpDelete("{todoID}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        public IActionResult DeleteTodo(int todoID)
+        {
+            if (!todoRepository.TodoExists(todoID))
+                return NotFound();
+            var todoToDelete = todoRepository.GetTodo(todoID);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            if (todoRepository.GetTodo(todoID) != todoToDelete)
+                return BadRequest(ModelState);
+            if(!todoRepository.DeleteToDo(todoToDelete))
+            {
+                ModelState.AddModelError("", "Something went wrong deleting ToDo");
+            }
+            return NoContent();
+        }
     }
 }

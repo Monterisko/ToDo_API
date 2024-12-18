@@ -91,5 +91,11 @@ namespace ToDo_API.Repository
             _context.Update(todo);
             return Save();
         }
+
+        public bool DeleteToDo(ToDo todo)
+        {
+            _context.Remove(todo);
+            return Save();
+        }
     }
 }
