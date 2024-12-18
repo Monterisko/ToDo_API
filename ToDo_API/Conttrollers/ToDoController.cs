@@ -120,5 +120,37 @@ namespace ToDo_API.Conttrollers
             return Ok("Successfully created");
         }
 
+        [HttpPut("{todoID}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
+        public IActionResult UpdateTodo(int todoID, [FromBody]TodoDTO updatedToDo)
+        {
+            if (updatedToDo == null)
+                return BadRequest(ModelState);
+            if (todoID != updatedToDo.Id)
+                return BadRequest(ModelState);
+            if (!todoRepository.TodoExists(todoID))
+                return NotFound();
+            if (!ModelState.IsValid)
+                return BadRequest();
+            var existingTodo = todoRepository.GetTodo(todoID);
+            if (updatedToDo.Title != null) { existingTodo.Title = updatedToDo.Title; }
+            if (updatedToDo.Description != null) { existingTodo.Description = updatedToDo.Description; }
+            if (updatedToDo.DateOfExpiry != DateTime.MinValue) { existingTodo.DateOfExpiry = updatedToDo.DateOfExpiry; }
+            if (updatedToDo.percentageComplete >= 0) { existingTodo.percentageComplete = updatedToDo.percentageComplete; }
+
+            if (!todoRepository.UpdateToDo(existingTodo))
+            {
+                ModelState.AddModelError("", "Something went wrong updating ToDo");
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();
+        }
+
+
+    
     }
 }

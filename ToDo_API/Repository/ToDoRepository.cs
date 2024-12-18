@@ -85,5 +85,11 @@ namespace ToDo_API.Repository
             var saved = _context.SaveChanges();
             return saved > 0 ? true : false;
         }
+
+        public bool UpdateToDo(ToDo todo)
+        {
+            _context.Update(todo);
+            return Save();
+        }
     }
 }

@@ -28,5 +28,8 @@ namespace ToDo_API.Interfaces
         bool CreateToDo(ToDo toDo);
 
         bool Save();
+
+        bool UpdateToDo(ToDo todo);
+
     }
 }
