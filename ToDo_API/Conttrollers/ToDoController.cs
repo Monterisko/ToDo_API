@@ -27,7 +27,12 @@ namespace ToDo_API.Conttrollers
         public IActionResult GetTodos()
         {
             var todos = mapper.Map<List<TodoDTO>>(todoRepository.GetTodos());
-            if(!ModelState.IsValid)
+
+            if (todos == null || !todos.Any()) 
+            { 
+                return NotFound("No ToDos found.");
+            }
+            if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             return Ok(todos);
         }
@@ -38,7 +43,7 @@ namespace ToDo_API.Conttrollers
         public IActionResult GetTodo(int todoID)
         {
             if(!todoRepository.TodoExists(todoID))
-                return NotFound();
+                return NotFound($"ToDo with ID {todoID} not found.");
 
             var todo = mapper.Map<ToDo>(todoRepository.GetTodo(todoID));
 
@@ -55,7 +60,7 @@ namespace ToDo_API.Conttrollers
         {
             if (!todoRepository.TodayTodoExists())
                 return NotFound();
-            var todo = mapper.Map <List<TodoDTO>>(todoRepository.GetTodayTodos());
+            var todo = mapper.Map<List<TodoDTO>>(todoRepository.GetTodayTodos());
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -99,14 +104,13 @@ namespace ToDo_API.Conttrollers
         public IActionResult CreateTodo([FromBody]TodoDTO todoCreate)
         {
             if (todoCreate == null)
-                return BadRequest(ModelState);
+                return BadRequest("Created ToDo cannot be null.");
             var todo = todoRepository.GetTodos()
                 .Where(t => t.Title.Trim().ToUpper() == todoCreate.Title.Trim().ToUpper()).FirstOrDefault();
 
-            if (todo != null)
+            if (todo != null || todoRepository.TodoExists(todoCreate.Id))
             {
-                ModelState.AddModelError("", "ToDo already exists");
-                return StatusCode(422, ModelState);
+                return BadRequest("ToDo already exists");
             }
             if(!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -128,20 +132,58 @@ namespace ToDo_API.Conttrollers
         public IActionResult UpdateTodo(int todoID, [FromBody]TodoDTO updatedToDo)
         {
             if (updatedToDo == null)
-                return BadRequest(ModelState);
+                return BadRequest("Updated ToDo cannot be null.");
             if (todoID != updatedToDo.Id)
-                return BadRequest(ModelState);
+                return BadRequest("ID missmatch.");
             if (!todoRepository.TodoExists(todoID))
-                return NotFound();
+                return NotFound("ToDo not found.");
             if (!ModelState.IsValid)
                 return BadRequest();
-            var existingTodo = todoRepository.GetTodo(todoID);
-            if (updatedToDo.Title != null) { existingTodo.Title = updatedToDo.Title; }
-            if (updatedToDo.Description != null) { existingTodo.Description = updatedToDo.Description; }
-            if (updatedToDo.DateOfExpiry != DateTime.MinValue) { existingTodo.DateOfExpiry = updatedToDo.DateOfExpiry; }
-            if (updatedToDo.percentageComplete >= 0) { existingTodo.percentageComplete = updatedToDo.percentageComplete; }
+            var todo = todoRepository.GetTodo(todoID);
+            if(updatedToDo.percentageComplete == 100)
+            {
+                todo.Done = true;
+            }
+            if (todo == null)
+            {
+                return BadRequest("Submitted data is invalid");
+            }
+            mapper.Map(updatedToDo, todo);
+            if (!todoRepository.UpdateToDo(todo))
+            {
+                ModelState.AddModelError("", "Something went wrong updating ToDo");
+                return StatusCode(500, ModelState);
+            }
 
-            if (!todoRepository.UpdateToDo(existingTodo))
+            return NoContent();
+        }
+
+        [HttpPut("{todoID}/percentage")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
+        public IActionResult UpdatePercentageTodo(int todoID, [FromBody] UpdatePercentageCompleteDTO updatedToDo)
+        {
+            if (updatedToDo == null)
+                return BadRequest("Updated ToDo cannot be null.");
+            if (todoID != updatedToDo.Id)
+                return BadRequest("ID mismatch.");
+            if (!todoRepository.TodoExists(todoID))
+                return NotFound("ToDo not found.");
+            if (!ModelState.IsValid)
+                return BadRequest();
+            var todo = todoRepository.GetTodo(todoID);
+            if (todo == null)
+            {
+                return BadRequest("Submitted data is invalid");
+            }
+            if (updatedToDo.percentageComplete == 100)
+            {
+                todo.Done = true;
+            }
+            if (updatedToDo.percentageComplete >= 0) { todo.percentageComplete = updatedToDo.percentageComplete; }
+            if (!todoRepository.UpdateToDo(todo))
             {
                 ModelState.AddModelError("", "Something went wrong updating ToDo");
                 return StatusCode(500, ModelState);
@@ -157,12 +199,12 @@ namespace ToDo_API.Conttrollers
         public IActionResult DeleteTodo(int todoID)
         {
             if (!todoRepository.TodoExists(todoID))
-                return NotFound();
+                return NotFound("Deleting a non-existent Todo");
             var todoToDelete = todoRepository.GetTodo(todoID);
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             if (todoRepository.GetTodo(todoID) != todoToDelete)
-                return BadRequest(ModelState);
+                return BadRequest("Deleting another Todo");
             if(!todoRepository.DeleteToDo(todoToDelete))
             {
                 ModelState.AddModelError("", "Something went wrong deleting ToDo");
