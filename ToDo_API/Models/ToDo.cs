@@ -1,7 +1,7 @@
 ﻿namespace ToDo_API.Models
 {
 
-    //
+    // Model Todo
     public class ToDo
     {
         public int Id { get; set; }

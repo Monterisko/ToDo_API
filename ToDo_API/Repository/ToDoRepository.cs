@@ -74,24 +74,25 @@ namespace ToDo_API.Repository
             return _context.Todos.Any(t => ((t.DateOfExpiry.Day <= week.Day && t.DateOfExpiry.Day >= today.Day) && (t.DateOfExpiry.Month == week.Month && t.DateOfExpiry.Month >= today.Month) && (t.DateOfExpiry.Year <= week.Year && t.DateOfExpiry.Year >= today.Year)));
         }
 
+        // Add todo to the database
         public bool CreateToDo(ToDo toDo)
         {
             _context.Add(toDo);
             return Save();
         }
-
+        // Save changes in the database
         public bool Save()
         {
             var saved = _context.SaveChanges();
             return saved > 0 ? true : false;
         }
-
+        // Update the todo in the database
         public bool UpdateToDo(ToDo todo)
         {
             _context.Update(todo);
             return Save();
         }
-
+        // Delete the todo from the database
         public bool DeleteToDo(ToDo todo)
         {
             _context.Remove(todo);
